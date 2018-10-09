@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	addr = flag.String("http", ":8000", "HTTP listen address")
+	addr = flag.String("http", ":8090", "HTTP listen address")
 	dev  = flag.Bool("dev", false, "dev mode")
 )
 
