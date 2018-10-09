@@ -38,6 +38,26 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
+  digest = "1:cdbed6a7b574b13bbabcd8c36c5be56d6444789bab21fcd37d39655eab0b2141"
+  name = "github.com/klauspost/compress"
+  packages = [
+    "flate",
+    "gzip",
+    "zlib",
+  ]
+  pruneopts = "UT"
+  revision = "b939724e787a27c0005cabe3f78e7ed7987ac74f"
+  version = "v1.4.0"
+
+[[projects]]
+  digest = "1:4ea0668d490ca32a38366453a486e2e8c60fbdaf1f2607c96b4a093d8a5c8de7"
+  name = "github.com/klauspost/cpuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ae7887de9fa5d2db4eaa8174a7eff2c1ac00f2da"
+  version = "v1.1"
+
+[[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
@@ -84,6 +104,35 @@
   revision = "8f918ac9ab4be3a790338bda8624fec5d71260b3"
 
 [[projects]]
+  digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
+  name = "github.com/valyala/bytebufferpool"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:6301ec20b1f40ce8463de7ad70ce75e6dce197bae76cb129c2cfdf4ec53ca62a"
+  name = "github.com/valyala/fasthttp"
+  packages = [
+    ".",
+    "fasthttputil",
+    "reuseport",
+    "stackless",
+  ]
+  pruneopts = "UT"
+  revision = "e5f51c11919d4f66400334047b897ef0a94c6f3c"
+  version = "v20180529"
+
+[[projects]]
+  branch = "master"
+  digest = "1:8507835fade46d48a94828b351e1f8fb83df1aa65ba1e67c9493b0a1b47abc73"
+  name = "github.com/valyala/tcplisten"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ceec8f93295a060cdb565ec25e4ccf17941dbd55"
+
+[[projects]]
   digest = "1:065f341c8b6bd094515eb5251d194482ebd9c4406149984a24dd19f9ed250c00"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -97,6 +146,22 @@
   pruneopts = "UT"
   revision = "ae8cc594552814363a7aeeb4f2825515a771fa38"
 
+[[projects]]
+  branch = "v1.0"
+  digest = "1:3b8abb011c6f0d1d7115e4877e11f87bacc834b28a66d054c4bab008b65c51ca"
+  name = "gopkg.in/tokopedia/grace.v1"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f3242e67d9aab49fd51bc85b5a87460080243fbb"
+
+[[projects]]
+  digest = "1:43b8a34f6390d8fbdcfd300ed52103064e9eaaecc7e50b7e3518fe246ebe8403"
+  name = "gopkg.in/tylerb/graceful.v1"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb"
+  version = "v1.2.15"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -107,6 +172,8 @@
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "golang.org/x/tools/go/vcs",
+    "gopkg.in/tokopedia/grace.v1",
+    "gopkg.in/tylerb/graceful.v1",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

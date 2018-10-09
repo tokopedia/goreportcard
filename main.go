@@ -14,6 +14,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/tokopedia/grace.v1"
+	graceful "gopkg.in/tylerb/graceful.v1"
 )
 
 var (
@@ -140,5 +142,20 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 
 	log.Printf("Running on %s ...", *addr)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+
+	l, err := grace.Listen(*addr)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	srv := &graceful.Server{
+		Timeout: 10 * time.Second,
+		Server: &http.Server{
+			ReadTimeout:  180 * time.Second,
+			WriteTimeout: 30 * time.Second,
+		},
+	}
+
+	log.Fatal(srv.Serve(l))
+
 }
