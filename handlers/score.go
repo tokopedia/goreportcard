@@ -17,14 +17,14 @@ import (
 func ScoresHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
-
-	repo, err := download.Clean(r.FormValue("repo"))
-	if err != nil {
-		log.Println("ERROR: from download.Clean:", err)
-		http.Error(w, "Could not download the repository: "+err.Error(), http.StatusBadRequest)
-		return
+	repo := r.FormValue("repo")
+	if repo == "" {
+		repo = "github.com/tokopedia/goreportcard"
+	} else {
+		repo = fmt.Sprintf("github.com/tokopedia/%s", repo)
 	}
 
+	repo, _ = download.Clean(repo)
 	log.Printf("Checking repo %q...", repo)
 	// write to boltdb
 	db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})
@@ -70,7 +70,6 @@ func ScoresHandler(w http.ResponseWriter, r *http.Request) {
 	score := "0"
 	for i := range sortedScores {
 		sortedScores[len(sortedScores)-i-1] = heap.Pop(scores).(scoreItem)
-		fmt.Println("", sortedScores[i].Repo)
 		if repo == sortedScores[i].Repo {
 			score = strconv.FormatFloat(sortedScores[i].Score, 'f', -1, 64)
 			break

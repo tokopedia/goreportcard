@@ -27,18 +27,20 @@ const (
 // CheckHandler handles the request for checking a repo
 func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	repo, err := download.Clean(r.FormValue("repo"))
-	if err != nil {
-		log.Println("ERROR: from download.Clean:", err)
-		http.Error(w, "Could not download the repository: "+err.Error(), http.StatusBadRequest)
-		return
+	repo := r.FormValue("repo")
+	if repo == "" {
+		repo = "github.com/tokopedia/goreportcard"
+	} else {
+		repo = fmt.Sprintf("github.com/tokopedia/%s", repo)
 	}
 
-	log.Printf("Checking repo %q...", repo)
+	repo, _ = download.Clean(repo)
+	branch := r.FormValue("branch")
+
+	log.Printf("Checking repo %q...%q", repo, branch)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
-	_, err = newChecksResp(repo, forceRefresh)
+	_, err := newChecksResp(repo, branch, forceRefresh)
 	if err != nil {
 		log.Println("ERROR: from newChecksResp:", err)
 		http.Error(w, "Could not analyze the repository: "+err.Error(), http.StatusBadRequest)
