@@ -91,7 +91,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	jsonValue, _ := json.Marshal(values)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
-	req.Header.Set("Authorization", "token 9a68fcaf5b2b58c98ec0e274a9e3861f89a5ef1a")
+	req.Header.Set("Authorization", "token 606aeaed6aef8e5d62c373b808ac3fed6bc75c49")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
