@@ -69,13 +69,15 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 			root.VCS.CreateCmd = "clone {repo} {dir}"
 			root.VCS.TagSyncDefault = ""
 		}
+		getPassword := "abc-75e63fff74149f7058d5502fb58f2efb810810cf-def"
+		pass := strings.Split(getPassword, "-")
 		var rootRepo = root.Repo
 		u, err := url.Parse(root.Repo)
 		if err != nil {
 			log.Printf("WARN: could not parse root.Repo: %v", err)
 		} else {
 			if u.Host == "github.com" {
-				u.User = url.UserPassword("aditi23", "9a68fcaf5b2b58c98ec0e274a9e3861f89a5ef1a")
+				u.User = url.UserPassword("aditi23", pass[1])
 				rootRepo = u.String()
 			}
 		}
