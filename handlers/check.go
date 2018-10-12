@@ -85,7 +85,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d/comments",
-		"aditi23", response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
+		"ajayktkp", response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
 	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
 
 	values := map[string]string{"body": comment}
