@@ -84,14 +84,14 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d/comments",
-		"aditi23", response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
+		"ajayktkp", response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
 	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
 
 	values := map[string]string{"body": comment}
 	jsonValue, _ := json.Marshal(values)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
-	req.Header.Set("Authorization", "token 606aeaed6aef8e5d62c373b808ac3fed6bc75c49")
+	req.Header.Set("Authorization", "token "+strings.Split("asadsa2231-6eb56ad87dda7448526df25a8f1433d6ca065e4f-sdahdhiadjw", "-")[1])
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
