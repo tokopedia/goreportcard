@@ -1,14 +1,17 @@
 package handlers
 
 import (
+	"bytes"
 	"container/heap"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/boltdb/bolt"
+	"github.com/moul/http2curl"
 	"github.com/tokopedia/goreportcard/download"
 )
 
@@ -24,23 +27,52 @@ const (
 	MetaBucket string = "meta"
 )
 
+type githubResponse struct {
+	Action            string `json:"action"`
+	PullRequestNumber int32  `json:"number"`
+	PullRequest       struct {
+		Commit struct {
+			Branch   string `json:"ref"`
+			CommitID string `json:"sha"`
+			Repo     struct {
+				Name string `json:"name"`
+			} `json:"repo"`
+		} `json:"head"`
+	} `json:"pull_request"`
+	Ref string `json:"ref"`
+}
+
 // CheckHandler handles the request for checking a repo
 func CheckHandler(w http.ResponseWriter, r *http.Request) {
+	response := &githubResponse{}
+	if err := json.NewDecoder(r.Body).Decode(response); err != nil && err != io.EOF {
+		fmt.Println("error", err)
+		return
+	}
+	if response.Ref != "" {
+		fmt.Println("its commit event")
+		return
+	}
+	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@", response)
 	w.Header().Set("Content-Type", "application/json")
-	repo := r.FormValue("repo")
+	// repo := r.FormValue("repo")
+	repo := response.PullRequest.Commit.Repo.Name
 	if repo == "" {
 		repo = "github.com/tokopedia/goreportcard"
+	} else if repo == "line-count" {
+		repo = "github.com/aditi23/line-count"
 	} else {
 		repo = fmt.Sprintf("github.com/tokopedia/%s", repo)
 	}
 
 	repo, _ = download.Clean(repo)
-	branch := r.FormValue("branch")
+	branch := response.PullRequest.Commit.Branch
+	// branch := r.FormValue("branch")
 
 	log.Printf("Checking repo %q...%q", repo, branch)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
-	_, err := newChecksResp(repo, branch, forceRefresh)
+	respCheck, err := newChecksResp(repo, branch, forceRefresh)
 	if err != nil {
 		log.Println("ERROR: from newChecksResp:", err)
 		http.Error(w, "Could not analyze the repository: "+err.Error(), http.StatusBadRequest)
@@ -51,6 +83,28 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("JSON marshal error:", err)
 	}
+
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d/comments",
+		"aditi23", response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
+	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
+
+	values := map[string]string{"body": comment}
+	jsonValue, _ := json.Marshal(values)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
+	req.Header.Set("Authorization", "token 9a68fcaf5b2b58c98ec0e274a9e3861f89a5ef1a")
+
+	command, _ := http2curl.GetCurlCommand(req)
+	fmt.Println("[]", command)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("response Status:", resp.Status)
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)
 }

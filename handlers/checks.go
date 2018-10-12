@@ -90,7 +90,7 @@ func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 		resp, err := getFromCache(repo)
 		if err != nil {
 			// just log the error and continue
-			log.Println(err)
+			log.Println("Error while getting from cache: ", err)
 		} else {
 			resp.Grade = grade(resp.Average * 100) // grade is not stored for some repos, yet
 			return resp, nil

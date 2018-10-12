@@ -26,11 +26,16 @@ func ScoresHandler(w http.ResponseWriter, r *http.Request) {
 
 	repo, _ = download.Clean(repo)
 	log.Printf("Checking repo %q...", repo)
-	// write to boltdb
+	score := Score(repo)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(score))
+}
+
+func Score(repo string) string {
 	db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Println("Failed to open bolt database: ", err)
-		return
+		return ""
 	}
 	defer db.Close()
 
@@ -61,12 +66,11 @@ func ScoresHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("ERROR: Failed to load high scores from bolt database: ", err)
-		http.Error(w, err.Error(), 500)
-		return
+		return ""
 	}
 
 	sortedScores := make([]scoreItem, len(*scores))
-	fmt.Println("", sortedScores)
+	fmt.Println("***********", sortedScores)
 	score := "0"
 	for i := range sortedScores {
 		sortedScores[len(sortedScores)-i-1] = heap.Pop(scores).(scoreItem)
@@ -75,6 +79,5 @@ func ScoresHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(score))
+	return score
 }

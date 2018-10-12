@@ -46,7 +46,22 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 	}
 	if ex {
 		log.Println("Update", root.Repo)
+		if root.VCS.Name == "Git" {
+			root.VCS.DownloadCmd = "fetch --all"
+			root.VCS.TagSyncDefault = ""
+		}
 		err = root.VCS.Download(fullLocalPath)
+		// if root.VCS.Name == "Git" {
+		// 	root.VCS.DownloadCmd = "checkout " + branch
+		// 	root.VCS.TagSyncDefault = ""
+		// }
+		// err = root.VCS.Download(fullLocalPath)
+		// log.Println("*********************** Error is ***********", err)
+		// if root.VCS.Name == "Git" {
+		// 	root.VCS.DownloadCmd = "pull --ff-only"
+		// 	root.VCS.TagSyncDefault = ""
+		// }
+		// err = root.VCS.Download(fullLocalPath)
 		if err != nil && firstAttempt {
 			// may have been rebased; we delete the directory, then try one more time:
 			log.Printf("Failed to download %q (%v), trying again...", root.Repo, err.Error())
@@ -62,7 +77,7 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 		log.Println("Create", root.Repo)
 
 		if root.VCS.Name == "Git" {
-			root.VCS.CreateCmd = "clone --depth 1 {repo} {dir}"
+			root.VCS.CreateCmd = "clone {repo} {dir}"
 			root.VCS.TagSyncDefault = ""
 		}
 		var rootRepo = root.Repo
@@ -71,7 +86,7 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 			log.Printf("WARN: could not parse root.Repo: %v", err)
 		} else {
 			if u.Host == "github.com" {
-				u.User = url.UserPassword("", "")
+				u.User = url.UserPassword("aditi23", "9a68fcaf5b2b58c98ec0e274a9e3861f89a5ef1a")
 				rootRepo = u.String()
 			}
 		}
