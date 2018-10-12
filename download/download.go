@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/tokopedia/goreportcard/accounts"
 	"golang.org/x/tools/go/vcs"
 )
 
@@ -69,15 +70,13 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 			root.VCS.CreateCmd = "clone {repo} {dir}"
 			root.VCS.TagSyncDefault = ""
 		}
-		getPassword := "abc-606aeaed6aef8e5d62c373b808ac3fed6bc75c49-def"
-		pass := strings.Split(getPassword, "-")
 		var rootRepo = root.Repo
 		u, err := url.Parse(root.Repo)
 		if err != nil {
 			log.Printf("WARN: could not parse root.Repo: %v", err)
 		} else {
 			if u.Host == "github.com" {
-				u.User = url.UserPassword("ajayktkp", pass[1])
+				u.User = url.UserPassword(accounts.Account.Username, accounts.Account.Password)
 				rootRepo = u.String()
 			}
 		}

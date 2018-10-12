@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
+	"github.com/tokopedia/goreportcard/accounts"
 	"github.com/tokopedia/goreportcard/download"
 )
 
@@ -91,7 +92,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	jsonValue, _ := json.Marshal(values)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
-	req.Header.Set("Authorization", "token 606aeaed6aef8e5d62c373b808ac3fed6bc75c49")
+	req.Header.Set("Authorization", "token "+accounts.Account.Password)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

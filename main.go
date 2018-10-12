@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/tokopedia/goreportcard/accounts"
 	"github.com/tokopedia/goreportcard/handlers"
 
 	"github.com/boltdb/bolt"
@@ -140,6 +141,8 @@ func main() {
 	http.HandleFunc(m.instrument("/", handlers.HomeHandler))
 
 	http.Handle("/metrics", promhttp.Handler())
+
+	accounts.SetAccount()
 
 	log.Printf("Running on %s ...", *addr)
 
