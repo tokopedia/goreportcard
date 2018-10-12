@@ -51,17 +51,6 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 			root.VCS.TagSyncDefault = ""
 		}
 		err = root.VCS.Download(fullLocalPath)
-		// if root.VCS.Name == "Git" {
-		// 	root.VCS.DownloadCmd = "checkout " + branch
-		// 	root.VCS.TagSyncDefault = ""
-		// }
-		// err = root.VCS.Download(fullLocalPath)
-		// log.Println("*********************** Error is ***********", err)
-		// if root.VCS.Name == "Git" {
-		// 	root.VCS.DownloadCmd = "pull --ff-only"
-		// 	root.VCS.TagSyncDefault = ""
-		// }
-		// err = root.VCS.Download(fullLocalPath)
 		if err != nil && firstAttempt {
 			// may have been rebased; we delete the directory, then try one more time:
 			log.Printf("Failed to download %q (%v), trying again...", root.Repo, err.Error())

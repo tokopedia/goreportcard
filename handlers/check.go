@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-	"github.com/moul/http2curl"
 	"github.com/tokopedia/goreportcard/download"
 )
 
@@ -93,9 +92,6 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
 	req.Header.Set("Authorization", "token 9a68fcaf5b2b58c98ec0e274a9e3861f89a5ef1a")
-
-	command, _ := http2curl.GetCurlCommand(req)
-	fmt.Println("[]", command)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
