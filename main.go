@@ -16,6 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"gopkg.in/tokopedia/grace.v1"
+	"gopkg.in/tokopedia/logging.v1"
 	graceful "gopkg.in/tylerb/graceful.v1"
 )
 
@@ -143,6 +144,7 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 
 	accounts.SetAccount()
+	logging.LogInit()
 
 	log.Printf("Running on %s ...", *addr)
 
