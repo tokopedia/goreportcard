@@ -81,8 +81,6 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("JSON marshal error:", err)
 	}
 
-	log.Printf("[CheckHandler] score for branch [%s] is: [%f]", branch, respCheck.Average)
-
 	postScoreComment(response, respCheck)
 
 	w.WriteHeader(http.StatusOK)
@@ -207,14 +205,12 @@ func updateMetadata(tx *bolt.Tx, resp checksResp, repo string, isNewRepo bool) e
 }
 
 func postScoreComment(response *githubResponse, respCheck checksResp) {
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d/comments",
-		accounts.Account.Username, response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
+	url := fmt.Sprintf("https://api.github.com/repos/tokopedia/%s/issues/%d/comments",
+		response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
 	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
 
 	requestBodyMap := map[string]string{"body": comment}
 	requestJSON, _ := json.Marshal(requestBodyMap)
-
-	log.Printf("[postScoreComment] URL: [%s] and requestBody: [%s]", url, requestJSON)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestJSON))
 	req.Header.Set("Authorization", "token "+accounts.Account.Password)
