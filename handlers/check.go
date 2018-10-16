@@ -81,6 +81,8 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("JSON marshal error:", err)
 	}
 
+	log.Printf("[CheckHandler] score for branch [%s] is: [%f]", branch, respCheck.Average)
+
 	postScoreComment(response, respCheck)
 
 	w.WriteHeader(http.StatusOK)
@@ -209,10 +211,12 @@ func postScoreComment(response *githubResponse, respCheck checksResp) {
 		accounts.Account.Username, response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
 	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
 
-	responseBodyMap := map[string]string{"body": comment}
-	responseJSON, _ := json.Marshal(responseBodyMap)
+	requestBodyMap := map[string]string{"body": comment}
+	requestJSON, _ := json.Marshal(requestBodyMap)
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(responseJSON))
+	log.Printf("[postScoreComment] URL: [%s] and requestBody: [%s]", url, requestJSON)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestJSON))
 	req.Header.Set("Authorization", "token "+accounts.Account.Password)
 
 	client := &http.Client{}
