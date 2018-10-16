@@ -90,7 +90,7 @@ func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 		resp, err := getFromCache(repo)
 		if err != nil {
 			// just log the error and continue
-			log.Println("Error while getting from cache: ", err)
+			log.Printf("[newChecksResp] [%s] [%s] Error while getting from cache: %s", repo, branch, err)
 		} else {
 			resp.Grade = grade(resp.Average * 100) // grade is not stored for some repos, yet
 			return resp, nil
@@ -116,7 +116,7 @@ func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 
 	err = check.RenameFiles(skipped)
 	if err != nil {
-		log.Println("Could not remove files:", err)
+		log.Printf("[newChecksResp] [%s] [%s] Could not remove files: %s", repo, branch, err)
 	}
 	defer check.RevertFiles(skipped)
 
@@ -137,7 +137,7 @@ func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 			p, summaries, err := c.Percentage()
 			errMsg := ""
 			if err != nil {
-				log.Printf("ERROR: (%s) %v", c.Name(), err)
+				log.Printf("[newChecksResp] [%s] [%s] ERROR: (%s) %v", repo, branch, c.Name(), err)
 				errMsg = err.Error()
 			}
 			s := score{
@@ -210,7 +210,7 @@ func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 	isNewRepo = oldRepoBytes == nil
 
 	// if this is a new repo, or the user force-refreshed, update the cache
-	if isNewRepo || forceRefresh {
+	if (isNewRepo || forceRefresh) && (branch == "staging") {
 		err = db.Update(func(tx *bolt.Tx) error {
 			log.Printf("Saving repo %q to cache...", repo)
 

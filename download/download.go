@@ -47,10 +47,6 @@ func download(path, branch, dest string, firstAttempt bool) (root *vcs.RepoRoot,
 	}
 	if ex {
 		log.Println("Update", root.Repo)
-		if root.VCS.Name == "Git" {
-			root.VCS.DownloadCmd = "fetch --all"
-			root.VCS.TagSyncDefault = ""
-		}
 		err = root.VCS.Download(fullLocalPath)
 		if err != nil && firstAttempt {
 			// may have been rebased; we delete the directory, then try one more time:

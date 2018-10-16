@@ -50,12 +50,10 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if response.Ref != "" {
-		fmt.Println("its commit event")
+		fmt.Println("commit event")
 		return
 	}
-	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@", response)
 	w.Header().Set("Content-Type", "application/json")
-	// repo := r.FormValue("repo")
 	repo := response.PullRequest.Commit.Repo.Name
 	if repo == "" {
 		repo = "github.com/tokopedia/goreportcard"
@@ -67,9 +65,8 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	repo, _ = download.Clean(repo)
 	branch := response.PullRequest.Commit.Branch
-	// branch := r.FormValue("branch")
 
-	log.Printf("Checking repo %q...%q", repo, branch)
+	log.Printf("[CheckHandler] Checking repo %q...%q", repo, branch)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
 	respCheck, err := newChecksResp(repo, branch, forceRefresh)
@@ -84,24 +81,8 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("JSON marshal error:", err)
 	}
 
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d/comments",
-		accounts.Account.Username, response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
-	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
+	postScoreComment(response, respCheck)
 
-	values := map[string]string{"body": comment}
-	jsonValue, _ := json.Marshal(values)
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
-	req.Header.Set("Authorization", "token "+accounts.Account.Password)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	fmt.Println("response Status:", resp.Status)
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)
 }
@@ -221,4 +202,24 @@ func updateMetadata(tx *bolt.Tx, resp checksResp, repo string, isNewRepo bool) e
 	}
 
 	return updateHighScores(mb, resp, repo)
+}
+
+func postScoreComment(response *githubResponse, respCheck checksResp) {
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d/comments",
+		accounts.Account.Username, response.PullRequest.Commit.Repo.Name, response.PullRequestNumber)
+	comment := fmt.Sprintf("tkpd-goreport score for commit %s is: %.2f", response.PullRequest.Commit.CommitID, (respCheck.Average * 100))
+
+	responseBodyMap := map[string]string{"body": comment}
+	responseJSON, _ := json.Marshal(responseBodyMap)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(responseJSON))
+	req.Header.Set("Authorization", "token "+accounts.Account.Password)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("[postScoreComment] Error occured while calling Github comment API for repo [%s] pull_request [%d]: [%v]",
+			response.PullRequest.Commit.Repo.Name, response.PullRequestNumber, err)
+	}
+	defer resp.Body.Close()
 }
