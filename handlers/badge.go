@@ -49,7 +49,7 @@ func badgePath(grade Grade, style string, dev bool) string {
 
 // BadgeHandler handles fetching the badge images
 func BadgeHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool) {
-	resp, err := newChecksResp(repo, "", false)
+	resp, err := newChecksResp(repo, "", "", false)
 
 	// See: http://shields.io/#styles
 	style := r.URL.Query().Get("style")

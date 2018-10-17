@@ -35,7 +35,8 @@ type githubResponse struct {
 			Branch   string `json:"ref"`
 			CommitID string `json:"sha"`
 			Repo     struct {
-				Name string `json:"name"`
+				Name          string `json:"name"`
+				DefaultBranch string `json:"default_branch"`
 			} `json:"repo"`
 		} `json:"head"`
 	} `json:"pull_request"`
@@ -69,7 +70,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[CheckHandler] Checking repo %q...%q", repo, branch)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
-	respCheck, err := newChecksResp(repo, branch, forceRefresh)
+	respCheck, err := newChecksResp(repo, branch, response.PullRequest.Commit.Repo.DefaultBranch, forceRefresh)
 	if err != nil {
 		log.Println("ERROR: from newChecksResp:", err)
 		http.Error(w, "Could not analyze the repository: "+err.Error(), http.StatusBadRequest)

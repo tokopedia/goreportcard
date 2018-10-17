@@ -85,7 +85,7 @@ type checksResp struct {
 	LastRefreshHumanized string    `json:"humanized_last_refresh"`
 }
 
-func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
+func newChecksResp(repo, branch, defaultBranch string, forceRefresh bool) (checksResp, error) {
 	if !forceRefresh {
 		resp, err := getFromCache(repo)
 		if err != nil {
@@ -210,7 +210,7 @@ func newChecksResp(repo, branch string, forceRefresh bool) (checksResp, error) {
 	isNewRepo = oldRepoBytes == nil
 
 	// if this is a new repo, or the user force-refreshed, update the cache
-	if (isNewRepo || forceRefresh) && (branch == "staging") {
+	if (isNewRepo || forceRefresh) && (branch == defaultBranch) {
 		err = db.Update(func(tx *bolt.Tx) error {
 			log.Printf("Saving repo %q to cache...", repo)
 
