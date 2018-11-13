@@ -28,7 +28,6 @@ var (
 func makeHandler(name string, dev bool, fn func(http.ResponseWriter, *http.Request, string, bool)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		validPath := regexp.MustCompile(fmt.Sprintf(`^/%s/([a-zA-Z0-9\-_\/\.]+)$`, name))
-
 		m := validPath.FindStringSubmatch(r.URL.Path)
 
 		if m == nil {
@@ -128,6 +127,7 @@ func main() {
 	if err := initDB(); err != nil {
 		log.Fatal("ERROR: could not open bolt db: ", err)
 	}
+	logging.LogInit()
 
 	m := setupMetrics()
 
@@ -144,7 +144,6 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 
 	accounts.SetAccount()
-	logging.LogInit()
 
 	log.Printf("Running on %s ...", *addr)
 
