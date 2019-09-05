@@ -1,0 +1,6 @@
+{
+  "name": "goreportcard",
+  "description": "Code base for generating report card for Go applications.",
+  "owner": "bmishra",
+  "slack_channel": "gql-alerts"
+}
